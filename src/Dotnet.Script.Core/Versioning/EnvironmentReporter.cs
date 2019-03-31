@@ -63,6 +63,7 @@ namespace Dotnet.Script.Core.Versioning
             sb.AppendLine($"Install location    : {ScriptEnvironment.Default.InstallLocation}");
             sb.AppendLine($"Target framework    : {netCoreVersion.Tfm}");
             sb.AppendLine($".NET Core version   : {netCoreVersion.Version}");
+            sb.AppendLine($".NET Core location  : {ScriptEnvironment.Default.GetDotnetInstallLocation()}");
             sb.AppendLine($"Platform identifier : {ScriptEnvironment.Default.PlatformIdentifier}");
             sb.AppendLine($"Runtime identifier  : {ScriptEnvironment.Default.RuntimeIdentifier}");
 
