@@ -55,6 +55,41 @@ namespace Dotnet.Script.DependencyModel.Environment
 
         public bool IsNetCore => _netCoreVersion.Value != DotnetVersion.Unknown;
 
+        public string GetDotnetInstallLocation(bool withoutDefaultInstallLocationFallback = false)
+        {
+            bool TryGetInstallLocationByCurrentProcess(out string path)
+            {
+                var processPath = System.Diagnostics.Process.GetCurrentProcess()?.MainModule?.FileName;
+
+                if (!string.IsNullOrWhiteSpace(processPath) && Path.GetFileNameWithoutExtension(processPath).ToLowerInvariant() == "dotnet")
+                {
+                    path = Path.GetDirectoryName(processPath);
+                    return true;
+                }
+                else
+                {
+                    path = null;
+                    return false;
+                }
+            }
+
+            string GetDefaultInstallLocation()
+            {
+                string basePath = IsWindows ? System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles) : "usr/local/share";
+                return Path.Combine(basePath, "dotnet");
+            }
+
+            {
+                if (TryGetInstallLocationByCurrentProcess(out var path))
+                    return path;
+
+                if (!withoutDefaultInstallLocationFallback)
+                    return GetDefaultInstallLocation();
+
+                return null;
+            }
+        }
+
         public void OverrideTargetFramework(string targetFramework)
         {
             if (_targetFramework.IsValueCreated)
@@ -93,24 +128,11 @@ namespace Dotnet.Script.DependencyModel.Environment
             return Path.GetDirectoryName(new Uri(typeof(ScriptEnvironment).GetTypeInfo().Assembly.CodeBase).LocalPath);
         }
 
-        private string GetDotnetBinaryPath()
-        {
-            string basePath;
-            if (IsWindows)
-            {
-                basePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles);
-            }
-            else
-            {
-                basePath = "usr/local/share";
-            }
-            return Path.Combine(basePath, "dotnet");
-        }
-
         private string GetPathToNuGetStoreFolder()
         {
             var processArchitecture = GetProcessArchitecture();
-            var storePath = Path.Combine(GetDotnetBinaryPath(), "store", processArchitecture, TargetFramework);
+            var dotnetInstallLocation = GetDotnetInstallLocation();
+            var storePath = Path.Combine(dotnetInstallLocation, "store", processArchitecture, TargetFramework);
             return storePath;
         }
 
