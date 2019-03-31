@@ -34,14 +34,14 @@ namespace Dotnet.Script.DependencyModel.Runtime
 
         private static IRestorer CreateRestorer(LogFactory logFactory, bool useRestoreCache)
         {
-            var commandRunner = new CommandRunner(logFactory);
+            var dotnetCommandRunner = new DotnetCommandRunner(logFactory);
             if (useRestoreCache)
             {
-                return new ProfiledRestorer(new CachedRestorer(new DotnetRestorer(commandRunner, logFactory),logFactory),logFactory);
+                return new ProfiledRestorer(new CachedRestorer(new DotnetRestorer(dotnetCommandRunner, logFactory),logFactory),logFactory);
             }
             else
             {
-                return new ProfiledRestorer(new DotnetRestorer(commandRunner, logFactory),logFactory);
+                return new ProfiledRestorer(new DotnetRestorer(dotnetCommandRunner, logFactory),logFactory);
             }
         }
 
