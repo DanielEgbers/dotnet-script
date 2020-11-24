@@ -53,7 +53,7 @@ namespace Dotnet.Script.DependencyModel.ProjectSystem
             var cachePath = SysEnvironment.GetEnvironmentVariable("DOTNET_SCRIPT_CACHE_LOCATION");
             if (!string.IsNullOrEmpty(cachePath))
             {
-                return cachePath;
+                return Path.GetFullPath(cachePath);
             }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
